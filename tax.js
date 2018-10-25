@@ -27,22 +27,44 @@ function calculateSalesTax(salesData, taxRates) {
   var results = {};
 
   for (var i = 0; i < salesData.length; i++) {
-      // console.log(salesData[i]);
       var coName = salesData[i].name;
+      var coObject = results[coName];
+      var sales = calculateTotalSales(i, salesData);
+      var tax = calculateTotalTax(i, salesData, taxRates);
 
-      if (results[coName]) {
-        // let currTotalSales = results[coName];
-        results[coName].totalSales += calculateTotalSales(i, salesData);
-        results[coName].totalTaxes += calculateTotalTax(i, salesData, taxRates);
+      if (coObject) {
+        results[coName].totalSales += sales;
+        results[coName].totalTaxes += tax;
       } else {
         results[coName] = {
-          totalSales: calculateTotalSales(i, salesData),
-          totalTaxes: calculateTotalTax(i, salesData, taxRates)
+          totalSales: sales,
+          totalTaxes: tax
         };
       }
-      //console.log(salesData[i].name);
   }
+  return results;
+}
 
+
+function calculateTotalSales(companyIndex, salesData) {
+  var array = salesData[companyIndex].sales;
+  var totalSales = array.reduce((x, y) => x + y);
+  return totalSales;
+}
+
+function calculateTotalTax(companyIndex, salesData, taxRates) {
+  var totalTax;
+  for (var p in salesTaxRates) {
+    if (salesData[companyIndex].province == p) {
+      totalTax = calculateTotalSales(companyIndex, salesData) * salesTaxRates[p];
+    }
+  }
+  return totalTax;
+}
+
+var results = calculateSalesTax(companySalesData, salesTaxRates);
+
+console.log(results);
 
   /* Expected Results:
 {
@@ -56,63 +78,4 @@ function calculateSalesTax(salesData, taxRates) {
           }
         }
 */
-
-  return results;
-}
-
-// function calculateSalesTax(salesData, taxRates) {
-
-//   var results = {};
-
-//   for (var i = 0; i < salesData.length; i++) {
-//       // console.log(salesData[i]);
-
-//       results[salesData[i].name] = {
-//         totalSales: calculateTotalSales(i, salesData),
-//         totalTaxes: calculateTotalTax(i, salesData, taxRates)
-//       };
-//       //console.log(salesData[i].name);
-//   }
-
-
-//   /* Expected Results:
-// {
-//           Telus: {
-//             totalSales: 1300
-//             totalTaxes: 144
-//           },
-//           Bombardier: {
-//             totalSales: 800,
-//             totalTaxes: 40
-//           }
-//         }
-// */
-
-//   return results;
-// }
-
-
-
-function calculateTotalSales(companyIndex, salesData) {
-  var array = salesData[companyIndex].sales;
-  var totalSales = array.reduce((x, y) => x + y);
-  return totalSales;
-}
-
-
-function calculateTotalTax(companyIndex, salesData, taxRates) {
-  var totalTax;
-  for (var p in salesTaxRates) {
-    // console.log(typeof(p));
-    if (salesData[companyIndex].province == p) {
-      totalTax = calculateTotalSales(companyIndex, salesData) * salesTaxRates[p];
-    }
-  }
-  // console.log(totalTax);
-  return totalTax;
-}
-
-var results = calculateSalesTax(companySalesData, salesTaxRates);
-
-console.log(results);
 
